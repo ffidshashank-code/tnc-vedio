@@ -33,17 +33,16 @@ const BASE = import.meta.env.BASE_URL?.replace(/\/$/, "") ?? "";
 const VISITOR_NAME_KEY = "tnc_visitor_name";
 const VISITOR_ID_KEY = "tnc_visitor_id";
 const DARK_MODE_KEY = "tnc-dark-mode";
-const CHANNEL_PROMPT_LAST_SHOWN_KEY = "tnc_channel_prompt_last_shown";
+const CHANNEL_JOIN_CLICKED_AT_KEY = "tnc_channel_join_clicked_at";
 const CHANNEL_PROMPT_COOLDOWN_MS = 24 * 60 * 60 * 1000;
-const CHANNEL_INVITE_URL = "https://t.me/+0oXQAFHg8qk4NTg1";
+const CHANNEL_INVITE_URL = "https://t.me/tnc_test_series_free";
 
 function shouldShowChannelPrompt(): boolean {
   try {
-    const lastShownAt = Number(localStorage.getItem(CHANNEL_PROMPT_LAST_SHOWN_KEY));
-    if (Number.isFinite(lastShownAt) && lastShownAt > 0 && Date.now() - lastShownAt < CHANNEL_PROMPT_COOLDOWN_MS) {
+    const lastJoinedClickAt = Number(localStorage.getItem(CHANNEL_JOIN_CLICKED_AT_KEY));
+    if (Number.isFinite(lastJoinedClickAt) && lastJoinedClickAt > 0 && Date.now() - lastJoinedClickAt < CHANNEL_PROMPT_COOLDOWN_MS) {
       return false;
     }
-    localStorage.setItem(CHANNEL_PROMPT_LAST_SHOWN_KEY, String(Date.now()));
   } catch {
     return true;
   }
@@ -173,6 +172,11 @@ export default function Layout({ children }: LayoutProps) {
   }
 
   function handleJoinChannel() {
+    try {
+      localStorage.setItem(CHANNEL_JOIN_CLICKED_AT_KEY, String(Date.now()));
+    } catch {
+      // Keep the prompt visible on the next page load if storage is unavailable.
+    }
     setShowChannelPrompt(false);
     openExternalLink(CHANNEL_INVITE_URL);
   }
@@ -447,20 +451,11 @@ export default function Layout({ children }: LayoutProps) {
       {showChannelPrompt && (
         <div className="fixed inset-0 z-[120] flex items-center justify-center bg-slate-950/65 px-4 py-6" role="dialog" aria-modal="true" aria-labelledby="channel-join-title" data-testid="channel-join-modal">
           <div className="relative w-full max-w-sm rounded-2xl border border-sky-100 bg-white p-6 text-center shadow-2xl">
-            <button
-              type="button"
-              onClick={() => setShowChannelPrompt(false)}
-              className="absolute right-3 top-3 rounded-lg p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-700"
-              aria-label="Close channel invitation"
-              data-testid="btn-close-channel-prompt"
-            >
-              <X size={18} />
-            </button>
             <div className="mx-auto mb-4 h-36 w-36 overflow-hidden rounded-2xl border border-gray-200 bg-black shadow-sm">
               <img src={`${BASE}/dark-logo-1.jpg`} alt="TNC channel logo" className="h-full w-full object-cover" />
             </div>
             <h2 id="channel-join-title" className="text-xl font-black text-gray-900">Join our Telegram channel</h2>
-            <p className="mt-2 text-sm leading-6 text-gray-500">Get course announcements and study updates from TNC Nursing.</p>
+            <p className="mt-2 text-sm leading-6 text-gray-500">Join the TNC Nursing channel to continue. Get course announcements and study updates there.</p>
             <button
               type="button"
               onClick={handleJoinChannel}
