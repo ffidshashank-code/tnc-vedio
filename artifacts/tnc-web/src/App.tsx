@@ -20,8 +20,6 @@ import WatchPage from "@/pages/watch";
 import PdfViewerPage from "@/pages/pdf-viewer";
 import NotFound from "@/pages/not-found";
 import LeaderboardPage from "@/pages/leaderboard";
-import QuizPage from "@/pages/quiz";
-import QuizTakePage from "@/pages/quiz-take";
 import BuyPage from "@/pages/buy";
 import WinterEffectsProvider, { useWinterEffects } from "@/components/WinterEffectsProvider";
 import WinterSnowfall from "@/components/WinterSnowfall";
@@ -40,6 +38,15 @@ const queryClient = new QueryClient({
 });
 
 const BASE = import.meta.env.BASE_URL?.replace(/\/$/, "") ?? "";
+const TEST_SITE_URL = "https://test.tncnursing.site/tnc-tests/";
+
+function RedirectToTests() {
+  useEffect(() => {
+    window.location.replace(TEST_SITE_URL);
+  }, []);
+
+  return <div className="px-4 py-12 text-center text-sm text-gray-500">Opening the test site...</div>;
+}
 
 type AppErrorBoundaryProps = { children: ReactNode };
 type AppErrorBoundaryState = { hasError: boolean };
@@ -92,8 +99,8 @@ function Router() {
       <Route path="/watched" component={WatchedPage} />
       <Route path="/enotes" component={EnotesPage} />
       <Route path="/leaderboard" component={LeaderboardPage} />
-      <Route path="/quiz" component={QuizPage} />
-      <Route path="/quiz/:examId" component={QuizTakePage} />
+      <Route path="/quiz" component={RedirectToTests} />
+      <Route path="/quiz/:examId" component={RedirectToTests} />
       <Route path="/buy" component={BuyPage} />
       <Route path="/admin" component={AdminPage} />
       <Route path="/watch/:sessionId" component={WatchPage} />

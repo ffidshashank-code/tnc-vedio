@@ -9,6 +9,8 @@ import { getUser } from "@/lib/auth";
 import CoursePrice from "@/components/CoursePrice";
 import { BATCH_THUMBNAIL_URL } from "@/lib/course-media";
 
+const TEST_SITE_URL = "https://test.tncnursing.site/tnc-tests/";
+
 function SliderCarousel() {
   const { data: sliders, isLoading } = useGetSliders();
   const [current, setCurrent] = useState(0);
@@ -132,12 +134,12 @@ function StreakWidget() {
           >
             <Video size={14} /> Watch a video
           </Link>
-          <Link
-            href="/quiz"
+          <a
+            href={TEST_SITE_URL}
             className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white/20 hover:bg-white/30 text-sm font-semibold transition-colors"
           >
-            <Brain size={14} /> Take a quiz
-          </Link>
+            <Brain size={14} /> Take a test
+          </a>
         </div>
       </div>
     </motion.div>
@@ -407,12 +409,12 @@ export default function HomePage() {
                     {label}
                   </Link>
                 ))}
-                <Link
-                  href="/quiz"
+                <a
+                  href={TEST_SITE_URL}
                   className="block text-white/70 hover:text-white text-sm transition-colors text-left"
                 >
                   Mock Tests
-                </Link>
+                </a>
               </div>
             </div>
             <div>

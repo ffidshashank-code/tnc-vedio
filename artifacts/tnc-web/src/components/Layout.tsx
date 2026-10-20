@@ -13,6 +13,7 @@ interface LayoutProps {
 
 const SUPPORT_URL = "https://t.me/testsagarbot";
 const CHANNEL_URL = "https://t.me/tnc_test_series_free";
+const TEST_SITE_URL = "https://test.tncnursing.site/tnc-tests/";
 
 type NavItem =
   | { path: string; label: string; icon: React.ElementType; external?: undefined }
@@ -22,7 +23,7 @@ const navItems: NavItem[] = [
   { path: "/", label: "Home", icon: Home },
   { path: "/videos", label: "Videos", icon: Video },
   { path: "/watched", label: "Watched", icon: History },
-  { path: "/quiz", label: "Quiz", icon: Brain },
+  { path: "/quiz", label: "Tests", icon: Brain, external: TEST_SITE_URL },
   { path: "/enotes", label: "E-Notes", icon: FileText },
   { path: "/leaderboard", label: "Leaderboard", icon: Trophy },
   { path: "/courses", label: "Courses", icon: BookOpen },
@@ -32,6 +33,22 @@ const BASE = import.meta.env.BASE_URL?.replace(/\/$/, "") ?? "";
 const VISITOR_NAME_KEY = "tnc_visitor_name";
 const VISITOR_ID_KEY = "tnc_visitor_id";
 const DARK_MODE_KEY = "tnc-dark-mode";
+const CHANNEL_PROMPT_LAST_SHOWN_KEY = "tnc_channel_prompt_last_shown";
+const CHANNEL_PROMPT_COOLDOWN_MS = 24 * 60 * 60 * 1000;
+const CHANNEL_INVITE_URL = "https://t.me/+0oXQAFHg8qk4NTg1";
+
+function shouldShowChannelPrompt(): boolean {
+  try {
+    const lastShownAt = Number(localStorage.getItem(CHANNEL_PROMPT_LAST_SHOWN_KEY));
+    if (Number.isFinite(lastShownAt) && lastShownAt > 0 && Date.now() - lastShownAt < CHANNEL_PROMPT_COOLDOWN_MS) {
+      return false;
+    }
+    localStorage.setItem(CHANNEL_PROMPT_LAST_SHOWN_KEY, String(Date.now()));
+  } catch {
+    return true;
+  }
+  return true;
+}
 
 function getGreeting(): string {
   const hour = new Date().getHours();
@@ -105,6 +122,7 @@ export default function Layout({ children }: LayoutProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [darkMode, setDarkMode] = useState(() => localStorage.getItem(DARK_MODE_KEY) === "true");
+  const [showChannelPrompt, setShowChannelPrompt] = useState(shouldShowChannelPrompt);
   const { enabled: winterEffectsEnabled, toggle: toggleWinterEffects } = useWinterEffects();
   const admin = isAdmin();
 
@@ -152,6 +170,11 @@ export default function Layout({ children }: LayoutProps) {
     clearAdminToken();
     setLocation("/");
     setMobileMenuOpen(false);
+  }
+
+  function handleJoinChannel() {
+    setShowChannelPrompt(false);
+    openExternalLink(CHANNEL_INVITE_URL);
   }
 
   return (
@@ -419,7 +442,37 @@ export default function Layout({ children }: LayoutProps) {
         <VisitorGreeting />
         {children}
       </main>
-      <TncLoginPrompt enabled={location === "/courses" || location.startsWith("/courses/") || location === "/quiz" || location.startsWith("/quiz/")} />
+      <TncLoginPrompt enabled={location === "/courses" || location.startsWith("/courses/")} />
+
+      {showChannelPrompt && (
+        <div className="fixed inset-0 z-[120] flex items-center justify-center bg-slate-950/65 px-4 py-6" role="dialog" aria-modal="true" aria-labelledby="channel-join-title" data-testid="channel-join-modal">
+          <div className="relative w-full max-w-sm rounded-2xl border border-sky-100 bg-white p-6 text-center shadow-2xl">
+            <button
+              type="button"
+              onClick={() => setShowChannelPrompt(false)}
+              className="absolute right-3 top-3 rounded-lg p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-700"
+              aria-label="Close channel invitation"
+              data-testid="btn-close-channel-prompt"
+            >
+              <X size={18} />
+            </button>
+            <div className="mx-auto mb-4 h-36 w-36 overflow-hidden rounded-2xl border border-gray-200 bg-black shadow-sm">
+              <img src={`${BASE}/dark-logo-1.jpg`} alt="TNC channel logo" className="h-full w-full object-cover" />
+            </div>
+            <h2 id="channel-join-title" className="text-xl font-black text-gray-900">Join our Telegram channel</h2>
+            <p className="mt-2 text-sm leading-6 text-gray-500">Get course announcements and study updates from TNC Nursing.</p>
+            <button
+              type="button"
+              onClick={handleJoinChannel}
+              className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-sky-600 px-4 py-3 text-sm font-bold text-white transition-colors hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2"
+              data-testid="btn-join-telegram-channel"
+            >
+              <Send size={16} />
+              Join Channel
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Mobile Bottom Tabs */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg z-40 flex" style={{ backgroundColor: "hsl(var(--card))" }}>
