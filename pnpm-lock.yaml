@@ -410,6 +410,9 @@ importers:
 
   artifacts/tnc-web:
     dependencies:
+      '@fingerprintjs/fingerprintjs':
+        specifier: ^5.3.0
+        version: 5.3.0
       firebase:
         specifier: ^12.16.0
         version: 12.16.0
@@ -760,6 +763,9 @@ packages:
     engines: {node: '>=18'}
     cpu: [x64]
     os: [linux]
+
+  '@fingerprintjs/fingerprintjs@5.3.0':
+    resolution: {integrity: sha512-goxeuSCF/LR8E/lcsCh/YTjhlFW7AOhj4A9RQ5GHpBOKwkX/OG3z8mY5ADR1xGVRB5bSEJB66WNh5eBwehx2nQ==}
 
   '@firebase/ai@2.13.1':
     resolution: {integrity: sha512-RhT/VViTPBSplhQSuEp62HhLvfsV+LowMh8ZUo5MMRDzG7oFtSget4Kmg5oHP50hDVyWQuQj6to9iPFEZk08Tw==}
@@ -3740,6 +3746,8 @@ snapshots:
 
   '@esbuild/linux-x64@0.27.3':
     optional: true
+
+  '@fingerprintjs/fingerprintjs@5.3.0': {}
 
   '@firebase/ai@2.13.1(@firebase/app-types@0.9.5)(@firebase/app@0.15.1)':
     dependencies:

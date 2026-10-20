@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useLocation } from "wouter";
 import { BookOpen, Video, FileText, Home, LogOut, Shield, Menu, X, ChevronRight, Brain, Trophy, Maximize2, Minimize2, MessageCircle, Send, UserRound, History, Moon, Sun, Snowflake } from "lucide-react";
 import { getUser, isAdmin, clearAdminToken } from "@/lib/auth";
-import { openExternalLink } from "@/lib/telegram";
+import { openExternalLink, openTelegramLink } from "@/lib/telegram";
 import { getTelegramUser } from "@/lib/telegram";
 import TncLoginPrompt from "@/components/TncLoginPrompt";
 import { useWinterEffects } from "@/components/WinterEffectsProvider";
@@ -31,7 +31,6 @@ const navItems: NavItem[] = [
 
 const BASE = import.meta.env.BASE_URL?.replace(/\/$/, "") ?? "";
 const VISITOR_NAME_KEY = "tnc_visitor_name";
-const VISITOR_ID_KEY = "tnc_visitor_id";
 const DARK_MODE_KEY = "tnc-dark-mode";
 const CHANNEL_JOIN_CLICKED_AT_KEY = "tnc_channel_join_clicked_at";
 const CHANNEL_PROMPT_COOLDOWN_MS = 24 * 60 * 60 * 1000;
@@ -66,9 +65,6 @@ function VisitorGreeting() {
   const [waifuUrl, setWaifuUrl] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!localStorage.getItem(VISITOR_ID_KEY)) {
-      localStorage.setItem(VISITOR_ID_KEY, crypto.randomUUID());
-    }
     if (name) localStorage.setItem(VISITOR_NAME_KEY, name);
 
     fetch("https://api.waifu.im/images?IncludedTags=waifu&IsNsfw=False&PageSize=1", { headers: { Accept: "application/json" } })
@@ -104,7 +100,7 @@ function VisitorGreeting() {
           <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
             <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-blue-50 text-blue-600"><UserRound size={23} /></div>
             <h2 id="visitor-name-title" className="text-center text-xl font-black text-gray-900">Welcome to TNC Nursing</h2>
-            <p className="mt-2 text-center text-sm text-gray-500">Enter your name to continue. We use it for your study greeting and leaderboard.</p>
+            <p className="mt-2 text-center text-sm text-gray-500">Choose your leaderboard name. A browser fingerprint helps keep your study history under one visitor identity across visits; it is not a secure account login.</p>
             <form onSubmit={(event) => { event.preventDefault(); saveName(); }} className="mt-5 space-y-3">
               <input autoFocus value={draftName} onChange={(event) => setDraftName(event.target.value)} placeholder="Enter your name" maxLength={80} className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500" data-testid="input-visitor-name" />
               <button type="submit" disabled={!draftName.trim()} className="w-full rounded-xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50" data-testid="btn-save-visitor-name">Continue</button>
@@ -178,7 +174,7 @@ export default function Layout({ children }: LayoutProps) {
       // Keep the prompt visible on the next page load if storage is unavailable.
     }
     setShowChannelPrompt(false);
-    openExternalLink(CHANNEL_INVITE_URL);
+    openTelegramLink(CHANNEL_INVITE_URL);
   }
 
   return (

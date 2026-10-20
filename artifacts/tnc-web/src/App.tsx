@@ -24,6 +24,7 @@ import BuyPage from "@/pages/buy";
 import WinterEffectsProvider, { useWinterEffects } from "@/components/WinterEffectsProvider";
 import WinterSnowfall from "@/components/WinterSnowfall";
 import { ApiError } from "@/lib/api-client/custom-fetch";
+import { initializeVisitorIdentity } from "@/lib/visitor-identity";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -128,6 +129,17 @@ function WinterSiteRouter() {
 function App() {
   const [banned, setBanned] = useState(false);
   const [checking, setChecking] = useState(true);
+  const [visitorIdentityReady, setVisitorIdentityReady] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+    void initializeVisitorIdentity().finally(() => {
+      if (active) setVisitorIdentityReady(true);
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   useEffect(() => {
     // If inside Telegram, do Telegram-specific setup
@@ -169,7 +181,7 @@ function App() {
   // This component handles keyboard blocking, devtools detection, and request blocking
   // It renders null but sets up all security measures in useEffect
 
-  if (checking) return <PageLoader />;
+  if (checking || !visitorIdentityReady) return <PageLoader />;
   if (banned) return <BannedScreen />;
 
   return (

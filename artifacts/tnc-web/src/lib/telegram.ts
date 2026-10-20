@@ -23,6 +23,7 @@ interface TelegramWebApp {
   isExpanded: boolean;
   version: string;
   platform: string;
+  openTelegramLink?: (url: string) => void;
   MainButton: {
     text: string;
     show(): void;
@@ -110,4 +111,17 @@ export function openExternalLink(url: string): void {
   } catch {
     window.open(url, "_blank", "noopener,noreferrer");
   }
+}
+
+export function openTelegramLink(url: string): void {
+  try {
+    const tg = window.Telegram?.WebApp;
+    if (tg?.openTelegramLink) {
+      tg.openTelegramLink(url);
+      return;
+    }
+  } catch {
+    // Fall back to same-tab navigation outside Telegram.
+  }
+  window.location.assign(url);
 }
