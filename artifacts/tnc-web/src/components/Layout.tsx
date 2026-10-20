@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useLocation } from "wouter";
 import { BookOpen, Video, FileText, Home, LogOut, Shield, Menu, X, ChevronRight, Brain, Trophy, Maximize2, Minimize2, MessageCircle, Send, UserRound, History, Moon, Sun, Snowflake } from "lucide-react";
 import { getUser, isAdmin, clearAdminToken } from "@/lib/auth";
-import { openExternalLink, openTelegramLink } from "@/lib/telegram";
+import { openExternalLink } from "@/lib/telegram";
 import { getTelegramUser } from "@/lib/telegram";
 import TncLoginPrompt from "@/components/TncLoginPrompt";
 import { useWinterEffects } from "@/components/WinterEffectsProvider";
@@ -167,14 +167,22 @@ export default function Layout({ children }: LayoutProps) {
     setMobileMenuOpen(false);
   }
 
-  function handleJoinChannel() {
+  function handleJoinChannel(event: React.MouseEvent<HTMLAnchorElement>) {
     try {
       localStorage.setItem(CHANNEL_JOIN_CLICKED_AT_KEY, String(Date.now()));
     } catch {
       // Keep the prompt visible on the next page load if storage is unavailable.
     }
     setShowChannelPrompt(false);
-    openTelegramLink(CHANNEL_INVITE_URL);
+    try {
+      const telegramApp = window.Telegram?.WebApp;
+      if (telegramApp?.openTelegramLink) {
+        telegramApp.openTelegramLink(CHANNEL_INVITE_URL);
+        event.preventDefault();
+      }
+    } catch {
+      // Allow the anchor's native navigation to open the channel.
+    }
   }
 
   return (
@@ -452,15 +460,15 @@ export default function Layout({ children }: LayoutProps) {
             </div>
             <h2 id="channel-join-title" className="text-xl font-black text-gray-900">Join our Telegram channel</h2>
             <p className="mt-2 text-sm leading-6 text-gray-500">Join the TNC Nursing channel to continue. Get course announcements and study updates there.</p>
-            <button
-              type="button"
+            <a
+              href={CHANNEL_INVITE_URL}
               onClick={handleJoinChannel}
               className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-sky-600 px-4 py-3 text-sm font-bold text-white transition-colors hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2"
               data-testid="btn-join-telegram-channel"
             >
               <Send size={16} />
               Join Channel
-            </button>
+            </a>
           </div>
         </div>
       )}

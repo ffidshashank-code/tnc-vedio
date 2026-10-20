@@ -3,6 +3,7 @@ import { Trophy, Medal, Clock3, RefreshCw } from "lucide-react";
 import Layout from "@/components/Layout";
 
 const BASE = import.meta.env.BASE_URL?.replace(/\/$/, "") ?? "";
+const FEATURED_VISITOR_ROW_ID = "web_fp_v2_5363fd62d30899e6bbb8f15b1eb619f7";
 
 interface LeaderboardRow {
   telegramId: string;
@@ -107,15 +108,17 @@ export default function LeaderboardPage() {
               </button>
             </div>
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-            {rows.map((row, index) => (
-              <div key={row.telegramId} className="flex items-center gap-3 px-5 py-4 border-b last:border-0 border-gray-50">
+            {rows.map((row, index) => {
+              const isFeaturedVisitor = row.telegramId === FEATURED_VISITOR_ROW_ID;
+              return (
+              <div key={row.telegramId} className={`flex items-center gap-3 px-5 py-4 border-b last:border-0 border-gray-50 ${isFeaturedVisitor ? "bg-amber-50" : ""}`}>
                 <div className={`w-9 h-9 rounded-xl flex items-center justify-center font-black ${
                   index === 0 ? "bg-yellow-100 text-yellow-700" : index === 1 ? "bg-gray-100 text-gray-600" : index === 2 ? "bg-orange-100 text-orange-700" : "bg-blue-50 text-blue-600"
                 }`}>
                   {index < 3 ? <Medal size={17} /> : index + 1}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-gray-900 truncate">{row.firstName || "Student"}</p>
+                  <p className={`font-semibold truncate ${isFeaturedVisitor ? "text-amber-700" : "text-gray-900"}`}>{row.firstName || "Student"}</p>
                   {row.username && <p className="text-xs text-gray-400">@{row.username}</p>}
                 </div>
                 <div className="text-right">
@@ -126,7 +129,8 @@ export default function LeaderboardPage() {
                   <div className="text-[11px] text-gray-400 mt-0.5">{row.sessions} sessions</div>
                 </div>
               </div>
-            ))}
+              );
+            })}
             </div>
           </>
         )}
